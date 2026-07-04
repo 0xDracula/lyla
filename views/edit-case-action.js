@@ -28,8 +28,6 @@ function register(app) {
     const whatTheyDid = values.what_they_did?.what_they_did_input?.value?.trim() || null;
     const banUntil = values.ban_until?.ban_date_input?.selected_date || null;
 
-    await ack();
-
     await updateCaseAction(actionId, body.user.id, {
       categoryCode,
       categoryExtra,
@@ -41,10 +39,13 @@ function register(app) {
       getCaseAssignees(caseNumber),
       getCaseActions(caseNumber),
     ]);
-    if (!caseData) return;
+    if (!caseData) {
+      await ack();
+      return;
+    }
 
-    await client.views.update({
-      view_id: body.view.id,
+    await ack({
+      response_action: "update",
       view: buildCaseInfoView({
         caseData: { ...caseData, status: currentStatus ?? caseData.status },
         assigneeIds: currentAssigneeIds ?? assignees.map((a) => a.userId),
