@@ -37,6 +37,11 @@ features:
       description: View or add notes on a user
       usage_hint: "[@user]"
       should_escape: false
+    - command: /lyla-info
+      url: https://lyla.hackclub.com/slack/events
+      description: View a user's case actions, notes, and change history
+      usage_hint: "[@user]"
+      should_escape: false
 oauth_config:
   redirect_urls:
     - "https://lyla.hackclub.com/slack/events"

@@ -22,6 +22,7 @@ import registerAssignees from "./commands/assignees.js";
 import registerMerge from "./commands/merge.js";
 import registerCase from "./commands/case.js";
 import registerNotes from "./commands/notes.js";
+import registerInfo from "./commands/info.js";
 import registerMergeView from "./views/merge.js";
 import { registerCaseOptions } from "./lib/case-options.js";
 import {
@@ -58,6 +59,7 @@ registerAssignees(app);
 registerMerge(app);
 registerCase(app);
 registerNotes(app);
+registerInfo(app);
 registerMergeView(app);
 registerCaseOptions(app);
 registerStickyPending(app);
