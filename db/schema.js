@@ -91,3 +91,13 @@ export const auditLog = pgTable(
   },
   (t) => [index("audit_log_subject_idx").on(t.subjectType, t.subjectId)]
 );
+
+export const userNotes = pgTable("user_notes", {
+  id: serial("id").primaryKey(),
+  targetUserId: text("target_user_id").notNull(),
+  body: text("body").notNull(),
+  createdBy: text("created_by").notNull(),
+  createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  editedBy: text("edited_by"),
+  editedAt: bigint("edited_at", { mode: "number" }),
+});
