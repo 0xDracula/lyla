@@ -18,7 +18,7 @@ function register(app) {
     const caseNumber = parseInt(parts[1], 10);
     if (isNaN(actionId) || isNaN(caseNumber)) return;
 
-    await deleteCaseAction(actionId);
+    await deleteCaseAction(actionId, body.user.id);
 
     const [caseData, assignees, actions] = await Promise.all([
       getCaseByNumber(caseNumber),
