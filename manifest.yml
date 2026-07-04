@@ -13,11 +13,6 @@ features:
     display_name: LYLA
     always_online: false
   slash_commands:
-    - command: /prevreports
-      url: https://lyla.hackclub.com/slack/events
-      description: Check a user's previous reports
-      usage_hint: "[@userID | email] [slack | airtable]"
-      should_escape: true
     - command: /lyla-assignees
       url: https://lyla.hackclub.com/slack/events
       description: Edit assignees for a case
@@ -48,7 +43,6 @@ oauth_config:
   scopes:
     user:
       - "chat:write"
-      - "search:read"
       - "users:read"
     bot:
       - "channels:history"
