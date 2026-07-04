@@ -26,6 +26,12 @@ function register(app) {
     const banDate = values.ban_until?.ban_date_input?.selected_date;
     const channelBanChannelId =
       values.channel_ban_channel?.channel_ban_select?.selected_channel || null;
+    const parsedCategoryCode = parseInt(
+      values.category?.category_select?.selected_option?.value,
+      10
+    );
+    const categoryCode = isNaN(parsedCategoryCode) ? null : parsedCategoryCode;
+    const categoryExtra = values.category_extra?.category_extra_input?.value?.trim() || null;
 
     if (!(await isAuthorized(body.user.id, client))) {
       await ack({ response_action: "errors", errors: { reported_users: UNAUTHORIZED_TEXT } });
@@ -123,14 +129,21 @@ function register(app) {
         }
 
         if (caseData) {
-          await recordAction(caseData.caseNumber, finalSolution, userId, resolvers, {
-            whatTheyDid: violation,
-            displayName,
-            email,
-            banUntil: banDate || null,
-            channelBanChannel: channelBanChannelId || null,
-            permalink,
-          });
+          await recordAction(
+            caseData.caseNumber,
+            finalSolution,
+            userId,
+            resolvers,
+            {
+              whatTheyDid: violation,
+              displayName,
+              email,
+              banUntil: banDate || null,
+              channelBanChannel: channelBanChannelId || null,
+              permalink,
+            },
+            { categoryCode, categoryExtra }
+          );
         }
       }
 

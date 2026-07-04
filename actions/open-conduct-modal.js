@@ -1,5 +1,6 @@
 import { buildConductModalBlocks } from "../lib/blocks.js";
 import { isAuthorized, UNAUTHORIZED_TEXT } from "../lib/auth.js";
+import { getActiveCategories } from "../lib/infraction-categories.js";
 
 function register(app) {
   app.action("open_conduct_modal", async ({ ack, body, client }) => {
@@ -15,7 +16,8 @@ function register(app) {
       message_ts: body.message.thread_ts || body.message.ts,
     });
 
-    const blocks = buildConductModalBlocks(body.user.id);
+    const categories = await getActiveCategories();
+    const blocks = buildConductModalBlocks(body.user.id, categories);
 
     await client.views.open({
       trigger_id: body.trigger_id,
