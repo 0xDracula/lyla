@@ -3,6 +3,7 @@ import schedule from "node-schedule";
 
 import { isDev, PORT } from "./lib/config.js";
 import { runMigrations } from "./lib/db.js";
+import { seedInfractionCategories } from "./lib/infraction-categories.js";
 
 import registerReactionAdded from "./events/reaction-added.js";
 import registerOpenConductModal from "./actions/open-conduct-modal.js";
@@ -51,6 +52,7 @@ registerStickyPending(app);
 
 (async () => {
   await runMigrations();
+  await seedInfractionCategories();
   await app.start();
   console.log("⚡️ Bolt app is running!");
   requestUpdate();
