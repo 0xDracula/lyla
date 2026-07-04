@@ -7,6 +7,7 @@ import {
   integer,
   jsonb,
   primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 
 export const cases = pgTable("cases", {
@@ -57,3 +58,20 @@ export const appState = pgTable("app_state", {
   key: text("key").primaryKey(),
   value: text("value"),
 });
+
+export const auditLog = pgTable(
+  "audit_log",
+  {
+    id: serial("id").primaryKey(),
+    subjectType: text("subject_type").notNull(),
+    subjectId: integer("subject_id").notNull(),
+    changeType: text("change_type").notNull(),
+    actorId: text("actor_id").notNull(),
+    before: jsonb("before"),
+    after: jsonb("after"),
+    caseNumber: integer("case_number"),
+    targetUserId: text("target_user_id"),
+    createdAt: bigint("created_at", { mode: "number" }).notNull(),
+  },
+  (t) => [index("audit_log_subject_idx").on(t.subjectType, t.subjectId)]
+);
