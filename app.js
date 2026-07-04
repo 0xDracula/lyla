@@ -3,18 +3,26 @@ import schedule from "node-schedule";
 
 import { isDev, PORT } from "./lib/config.js";
 import { runMigrations } from "./lib/db.js";
+import { seedInfractionCategories } from "./lib/infraction-categories.js";
 
 import registerReactionAdded from "./events/reaction-added.js";
 import registerOpenConductModal from "./actions/open-conduct-modal.js";
 import registerClaimCase from "./actions/claim-case.js";
 import registerCaseInfoActions from "./actions/case-info.js";
+import registerEditCaseAction from "./actions/edit-case-action.js";
+import registerUserNotesActions from "./actions/user-notes.js";
+import registerUserInfoActions from "./actions/user-info.js";
 import registerConductReportView from "./views/conduct-report.js";
+import registerEditCaseActionView from "./views/edit-case-action.js";
 import registerEditAssigneesView from "./views/edit-assignees.js";
 import registerCaseInfoView from "./views/case-info.js";
-import registerPrevReports from "./commands/prevreports.js";
+import registerUserNotesView from "./views/user-notes.js";
+import registerEditUserNoteView from "./views/edit-user-note.js";
 import registerAssignees from "./commands/assignees.js";
 import registerMerge from "./commands/merge.js";
 import registerCase from "./commands/case.js";
+import registerNotes from "./commands/notes.js";
+import registerInfo from "./commands/info.js";
 import registerMergeView from "./views/merge.js";
 import { registerCaseOptions } from "./lib/case-options.js";
 import {
@@ -38,19 +46,27 @@ registerReactionAdded(app);
 registerOpenConductModal(app);
 registerClaimCase(app);
 registerCaseInfoActions(app);
+registerEditCaseAction(app);
+registerUserNotesActions(app);
+registerUserInfoActions(app);
 registerConductReportView(app);
+registerEditCaseActionView(app);
 registerEditAssigneesView(app);
 registerCaseInfoView(app);
-registerPrevReports(app);
+registerUserNotesView(app);
+registerEditUserNoteView(app);
 registerAssignees(app);
 registerMerge(app);
 registerCase(app);
+registerNotes(app);
+registerInfo(app);
 registerMergeView(app);
 registerCaseOptions(app);
 registerStickyPending(app);
 
 (async () => {
   await runMigrations();
+  await seedInfractionCategories();
   await app.start();
   console.log("⚡️ Bolt app is running!");
   requestUpdate();

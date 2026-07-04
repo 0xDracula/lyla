@@ -13,11 +13,6 @@ features:
     display_name: LYLA
     always_online: false
   slash_commands:
-    - command: /prevreports
-      url: https://lyla.hackclub.com/slack/events
-      description: Check a user's previous reports
-      usage_hint: "[@userID | email] [slack | airtable]"
-      should_escape: true
     - command: /lyla-assignees
       url: https://lyla.hackclub.com/slack/events
       description: Edit assignees for a case
@@ -32,13 +27,22 @@ features:
       description: View and edit a case
       usage_hint: "[case number]"
       should_escape: false
+    - command: /lyla-notes
+      url: https://lyla.hackclub.com/slack/events
+      description: View or add notes on a user
+      usage_hint: "[@user]"
+      should_escape: false
+    - command: /lyla-info
+      url: https://lyla.hackclub.com/slack/events
+      description: View a user's case actions, notes, and change history
+      usage_hint: "[@user]"
+      should_escape: false
 oauth_config:
   redirect_urls:
     - "https://lyla.hackclub.com/slack/events"
   scopes:
     user:
       - "chat:write"
-      - "search:read"
       - "users:read"
     bot:
       - "channels:history"
