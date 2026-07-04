@@ -46,12 +46,28 @@ export const caseAssignees = pgTable(
 
 export const caseActions = pgTable("case_actions", {
   id: serial("id").primaryKey(),
-  caseNumber: integer("case_number").notNull(), // FK to cases(case_number)
-  actionType: text("action_type").notNull(), // temp_ban | perma_ban | dm | warning | shush | locked_thread | etc.
+  caseNumber: integer("case_number").notNull(),
+  actionType: text("action_type").notNull(),
   targetUserId: text("target_user_id").notNull(),
   performedBy: text("performed_by").array().notNull(),
-  data: jsonb("data").notNull().default({}), // ban/shush dates, violation text, display name, email, etc.
+  data: jsonb("data").notNull().default({}),
   performedAt: bigint("performed_at", { mode: "number" }).notNull(),
+  categoryCode: integer("category_code").references(() => infractionCategories.code, {
+    onDelete: "set null",
+  }),
+  categoryExtra: text("category_extra"),
+  updatedAt: bigint("updated_at", { mode: "number" }),
+});
+
+export const infractionCategories = pgTable("infraction_categories", {
+  code: integer("code").primaryKey(),
+  name: text("name").notNull(),
+  groupName: text("group_name"),
+  ladderNoPriors: jsonb("ladder_no_priors").notNull().default([]),
+  ladderWithPriors: jsonb("ladder_with_priors").notNull().default([]),
+  notes: text("notes"),
+  active: boolean("active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
 });
 
 export const appState = pgTable("app_state", {
