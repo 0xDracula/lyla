@@ -24,6 +24,10 @@ function register(app) {
   registerShowMore(app, "show_more_actions", "actionsLimit");
   registerShowMore(app, "show_more_notes", "notesLimit");
   registerShowMore(app, "show_more_audit", "auditLimit");
+
+  app.action("view_case_thread", async ({ ack }) => {
+    await ack();
+  });
 }
 
 export default register;
