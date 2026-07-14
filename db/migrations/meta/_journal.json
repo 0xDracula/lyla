@@ -43,6 +43,13 @@
       "when": 1783172823874,
       "tag": "0005_awesome_toxin",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784040666368,
+      "tag": "0006_thin_gabe_jones",
+      "breakpoints": true
     }
   ]
 }
