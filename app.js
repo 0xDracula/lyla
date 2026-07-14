@@ -33,6 +33,7 @@ import {
 
 import checkBansForToday from "./jobs/check-bans-for-today.js";
 import checkPendingThreads from "./jobs/check-pending-threads.js";
+import syncUnsyncedCaseActions from "./jobs/sync-unsynced-case-actions.js";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -85,5 +86,10 @@ registerStickyPending(app);
 
   schedule.scheduleJob("*/30 * * * * *", async () => {
     await checkPendingThreads();
+  });
+
+  await syncUnsyncedCaseActions();
+  schedule.scheduleJob("*/15 * * * *", async () => {
+    await syncUnsyncedCaseActions();
   });
 })();
