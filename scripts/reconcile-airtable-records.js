@@ -1,3 +1,4 @@
+import "../lib/config.js";
 import { base } from "../lib/clients.js";
 import { db } from "../lib/db.js";
 import { cases, caseActions } from "../db/schema.js";
