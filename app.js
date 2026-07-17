@@ -34,6 +34,40 @@ import {
 import checkBansForToday from "./jobs/check-bans-for-today.js";
 import checkPendingThreads from "./jobs/check-pending-threads.js";
 import syncUnsyncedCaseActions from "./jobs/sync-unsynced-case-actions.js";
+import {
+  ensureWebhook,
+  refreshWebhook,
+  verifyMac,
+  processNewPayloads,
+} from "./lib/airtable-webhook.js";
+
+function readRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", () => resolve(Buffer.concat(chunks)));
+    req.on("error", reject);
+  });
+}
+
+async function handleAirtableWebhook(req, res) {
+  const rawBody = await readRawBody(req);
+  const macHeader = req.headers["x-airtable-content-mac"];
+  const valid = await verifyMac(rawBody, macHeader);
+
+  if (!valid) {
+    console.error("[airtable-webhook] rejected ping: invalid or missing MAC");
+    res.writeHead(401);
+    res.end();
+    return;
+  }
+
+  res.writeHead(200);
+  res.end();
+  processNewPayloads().catch((error) => {
+    console.error("[airtable-webhook] processNewPayloads failed:", error.message);
+  });
+}
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -41,6 +75,17 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
   socketMode: isDev,
   port: PORT,
+  ...(isDev
+    ? {}
+    : {
+        customRoutes: [
+          {
+            path: "/airtable-webhook",
+            method: ["POST"],
+            handler: handleAirtableWebhook,
+          },
+        ],
+      }),
 });
 
 registerReactionAdded(app);
@@ -91,5 +136,10 @@ registerStickyPending(app);
   await syncUnsyncedCaseActions();
   schedule.scheduleJob("*/15 * * * *", async () => {
     await syncUnsyncedCaseActions();
+  });
+
+  await ensureWebhook();
+  schedule.scheduleJob("0 3 * * *", async () => {
+    await refreshWebhook();
   });
 })();
