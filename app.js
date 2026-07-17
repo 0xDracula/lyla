@@ -2,7 +2,14 @@ import { App } from "@slack/bolt";
 import http from "http";
 import schedule from "node-schedule";
 
-import { isDev, PORT } from "./lib/config.js";
+import {
+  isDev,
+  PORT,
+  FIREHOUSE_CHANNEL,
+  LOG_CHANNEL,
+  NOTIF_CHANNEL,
+  ALLOWED_CHANNELS,
+} from "./lib/config.js";
 import { runMigrations } from "./lib/db.js";
 import { seedInfractionCategories } from "./lib/infraction-categories.js";
 
@@ -41,6 +48,19 @@ import {
   verifyMac,
   processNewPayloads,
 } from "./lib/airtable-webhook.js";
+
+const REQUIRED_CHANNEL_VARS = { FIREHOUSE_CHANNEL, LOG_CHANNEL, NOTIF_CHANNEL };
+const missingChannelVars = Object.entries(REQUIRED_CHANNEL_VARS)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+if (ALLOWED_CHANNELS.length === 0) missingChannelVars.push("ALLOWED_CHANNELS");
+
+if (missingChannelVars.length > 0) {
+  console.error(
+    `Missing required env var(s): ${missingChannelVars.join(", ")}. Refusing to start. See .env.example.`
+  );
+  process.exit(1);
+}
 
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
