@@ -1,4 +1,5 @@
 import { App } from "@slack/bolt";
+import http from "http";
 import schedule from "node-schedule";
 
 import { isDev, PORT } from "./lib/config.js";
@@ -110,6 +111,25 @@ registerMergeView(app);
 registerCaseOptions(app);
 registerStickyPending(app);
 
+if (isDev && process.env.AIRTABLE_WEBHOOK_URL) {
+  http
+    .createServer((req, res) => {
+      if (req.method === "POST" && req.url === "/airtable-webhook") {
+        handleAirtableWebhook(req, res).catch((error) => {
+          console.error("[airtable-webhook] handler failed:", error.message);
+          res.writeHead(500);
+          res.end();
+        });
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    })
+    .listen(PORT, () => {
+      console.log(`[airtable-webhook] dev listener on :${PORT}`);
+    });
+}
+
 (async () => {
   await runMigrations();
   await seedInfractionCategories();
@@ -138,7 +158,17 @@ registerStickyPending(app);
     await syncUnsyncedCaseActions();
   });
 
-  await ensureWebhook();
+  await ensureWebhook().catch((error) => {
+    console.error("[airtable-webhook] ensureWebhook failed:", error.message);
+  });
+  await processNewPayloads().catch((error) => {
+    console.error("[airtable-webhook] boot catch-up failed:", error.message);
+  });
+  schedule.scheduleJob("*/2 * * * *", async () => {
+    await processNewPayloads().catch((error) => {
+      console.error("[airtable-webhook] backstop poll failed:", error.message);
+    });
+  });
   schedule.scheduleJob("0 3 * * *", async () => {
     await refreshWebhook();
   });
