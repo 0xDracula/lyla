@@ -48,7 +48,11 @@ async function main() {
   let ambiguous = 0;
   let skippedNoUser = 0;
 
-  for (const record of records) {
+  for (const [index, record] of records.entries()) {
+    if ((index + 1) % 100 === 0) {
+      console.log(`Progress: ${index + 1}/${records.length}`);
+    }
+
     const existing = await getCaseActionByAirtableRecordId(record.id);
     if (existing) {
       alreadyReconciled++;
